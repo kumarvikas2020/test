@@ -1,1 +1,28 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+jobs:
+  docker-build:
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+    env:
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout che-workspace-loader source code
+    - name: Docker Buildx
+      uses: crazy-max/ghaction-docker-buildx@v1.6.2
+      with:
+        buildx-version: v0.4.1
+    - name: "Docker prepare"
+      run: docker image prune -a -f
+    - name: "Docker build"
+      uses: nick-invision/retry@v1
+      with:
+        timeout_minutes: 20
+        max_attempts: 5
+        retry_wait_seconds: 60
+        command: docker buildx build --platform linux/ppc64le -t ubuntu1234 .
 
